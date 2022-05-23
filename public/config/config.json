@@ -1,18 +1,18 @@
 {
-  "CONTRACT_ADDRESS": "0x59bCee1E9Ab27B3c593A2cfa73349C52503A47AE",
-  "SCAN_LINK": "https://rinkeby.etherscan.com/token/0x59bCee1E9Ab27B3c593A2cfa73349C52503A47AE",
+  "CONTRACT_ADDRESS": "0xB021B4f0AB7a226e83b2f3F975cd87F2DEfF932d",
+  "SCAN_LINK": "https://etherscan.com/token/0xB021B4f0AB7a226e83b2f3F975cd87F2DEfF932d",
   "NETWORK": {
-    "NAME": "Rinkeby",
+    "NAME": "Mainnet",
     "SYMBOL": "ETH",
-    "ID": 4
+    "ID": 1
   },
   "NFT_NAME": "Soku Samurais",
   "SYMBOL": "Soku Samurai",
   "MAX_SUPPLY": 1000,
-  "WEI_COST": 80000000000000000,
-  "DISPLAY_COST": 0.08,
+  "WEI_COST": 70000000000000000,
+  "DISPLAY_COST": 0.07,
   "GAS_LIMIT": 285000,
   "MARKETPLACE": "Opensea",
-  "MARKETPLACE_LINK": "https://opensea.io/collection/nft-thingy",
+  "MARKETPLACE_LINK": "https://opensea.io/collection/sokuswap-samurainftv1",
   "SHOW_BACKGROUND": true
 }
