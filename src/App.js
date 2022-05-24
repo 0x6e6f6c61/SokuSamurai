@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { connect } from "./redux/blockchain/blockchainActions";
 import { fetchData } from "./redux/data/dataActions";
@@ -99,7 +99,9 @@ function App() {
   const blockchain = useSelector((state) => state.blockchain);
   const data = useSelector((state) => state.data);
   const [claimingNft, setClaimingNft] = useState(false);
+  const [claimingFreeNft, setClaimingFreeNft] = useState(false);
   const [isTheyConnected, setIsTheyConnected] = useState(false);
+  const [isTheyWhitelisted, setIsTheyWhitelisted] = useState(false);
   const [feedback, setFeedback] = useState(`Click buy to mint your NFT.`);
   const [mintAmount, setMintAmount] = useState(1);
   const [CONFIG, SET_CONFIG] = useState({
@@ -153,6 +155,47 @@ function App() {
       });
   };
 
+  const fetchWhitelisted = useCallback(async()=>{
+    if (blockchain.smartContract) {
+      setIsTheyWhitelisted(
+      await blockchain.smartContract.methods
+      .whitelisted(blockchain.account)
+      .call());
+    }
+  },[blockchain,blockchain.account]);
+
+  const claimFreeNFT = () => {
+    let cost = 0;
+    let gasLimit = CONFIG.GAS_LIMIT;
+    let totalCostWei = String(cost);
+    let totalGasLimit = String(gasLimit);
+    console.log("Cost: ", totalCostWei);
+    console.log("Gas limit: ", totalGasLimit);
+    setFeedback(`Minting your ${CONFIG.NFT_NAME}...`);
+    setClaimingFreeNft(true);
+    blockchain.smartContract.methods
+      .whitelistMint()
+      .send({
+        gasLimit: String(totalGasLimit),
+        to: CONFIG.CONTRACT_ADDRESS,
+        from: blockchain.account,
+        value: totalCostWei,
+      })
+      .once("error", (err) => {
+        console.log(err);
+        setFeedback("Sorry, something went wrong please try again later.");
+        setClaimingFreeNft(false);
+      })
+      .then((receipt) => {
+        console.log(receipt);
+        setFeedback(
+          `WOW, the ${CONFIG.NFT_NAME} is yours! go visit Opensea.io to view it.`
+        );
+        setClaimingFreeNft(false);
+        dispatch(fetchData(blockchain.account));
+      });
+  };
+
   const decrementMintAmount = () => {
     let newMintAmount = mintAmount - 1;
     if (newMintAmount < 1) {
@@ -193,6 +236,10 @@ function App() {
   useEffect(() => {
     getData();
   }, [blockchain.account]);
+
+  useEffect(() => {
+    fetchWhitelisted();
+  }, [fetchWhitelisted]);
 
   return (
     <s.Screen>
@@ -362,6 +409,20 @@ function App() {
                         }}
                       >
                         {claimingNft ? "BUSY" : "BUY"}
+                      </StyledButton>
+                    </s.Container>
+                    <s.SpacerSmall />
+                    <s.Container ai={"center"} jc={"center"} fd={"row"}>
+                      <StyledButton
+                        style={{ display: !isTheyWhitelisted ? "none" : "" }}
+                        disabled={claimingFreeNft || !isTheyWhitelisted ? 1 : 0}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          claimFreeNFT();
+                          getData();
+                        }}
+                      >
+                        {claimingNft ? "BUSY" : "WHITELIST MINT"}
                       </StyledButton>
                     </s.Container>
                   </>
